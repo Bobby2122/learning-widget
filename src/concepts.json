@@ -1,0 +1,272 @@
+[
+  {
+    "id": "mental-models",
+    "title": "Mental Models",
+    "category": "Productivity",
+    "level": "Starter",
+    "minutes": 5,
+    "summary": "Useful simplifications that help you reason about how the world works.",
+    "explanation": "A mental model is a compact representation of a system. It leaves details out on purpose so you can focus on the relationships that matter for a decision.",
+    "example": "A subway map distorts real geography but preserves stations and connections. It is inaccurate in the ways that do not matter and useful in the ways that do.",
+    "why": "A varied set of models gives you more than one way to frame a problem and helps you notice when a familiar lens is misleading you.",
+    "prerequisites": [],
+    "next": ["systems-thinking", "opportunity-cost"],
+    "accent": "coral",
+    "sources": [
+      { "type": "Article", "label": "Farnam Street guide", "url": "https://fs.blog/mental-models/" },
+      { "type": "Video", "label": "Mental models overview", "url": "https://www.youtube.com/results?search_query=mental+models+explained" }
+    ]
+  },
+  {
+    "id": "systems-thinking",
+    "title": "Systems Thinking",
+    "category": "Productivity",
+    "level": "Starter",
+    "minutes": 7,
+    "summary": "See patterns and relationships instead of isolated events.",
+    "explanation": "Systems thinking asks how parts interact over time. It looks for feedback, delays, constraints, and incentives that create recurring behavior.",
+    "example": "Adding a road lane may reduce traffic briefly. Easier driving attracts more drivers, so congestion returns. The road and driver behavior are one connected system.",
+    "why": "It shifts your attention from quick fixes toward the structure producing a problem, where smaller and more durable changes are often possible.",
+    "prerequisites": ["mental-models"],
+    "next": ["feedback-loops", "second-order-effects"],
+    "accent": "mint",
+    "sources": [
+      { "type": "Article", "label": "Thinking in Systems notes", "url": "https://donellameadows.org/systems-thinking-resources/" },
+      { "type": "Video", "label": "Systems thinking primer", "url": "https://www.youtube.com/results?search_query=systems+thinking+primer" }
+    ]
+  },
+  {
+    "id": "feedback-loops",
+    "title": "Feedback Loops",
+    "category": "Computer Science",
+    "level": "Starter",
+    "minutes": 6,
+    "summary": "Outputs circle back to influence what happens next.",
+    "explanation": "Reinforcing loops amplify change, while balancing loops resist it. Delays inside a loop can make a system oscillate or overshoot.",
+    "example": "A thermostat is a balancing loop: a rising temperature switches the heater off. Compound interest is reinforcing: growth creates a larger base for more growth.",
+    "why": "Feedback loops explain habits, product growth, climate systems, algorithms, and why some interventions create the opposite of what was intended.",
+    "prerequisites": ["systems-thinking"],
+    "next": ["compounding", "gradient-descent"],
+    "accent": "blue",
+    "sources": [
+      { "type": "Article", "label": "Feedback loop basics", "url": "https://en.wikipedia.org/wiki/Feedback" },
+      { "type": "Video", "label": "Reinforcing vs balancing", "url": "https://www.youtube.com/results?search_query=reinforcing+balancing+feedback+loops" }
+    ]
+  },
+  {
+    "id": "opportunity-cost",
+    "title": "Opportunity Cost",
+    "category": "Economics",
+    "level": "Starter",
+    "minutes": 4,
+    "summary": "Every choice also costs the best alternative you give up.",
+    "explanation": "Opportunity cost makes tradeoffs visible. The cost of an action includes not only money or time spent, but the value of the strongest option you did not choose.",
+    "example": "An hour-long meeting costs the hour plus the best alternative use of it, such as focused work, exercise, or rest.",
+    "why": "It improves choices about attention, products, careers, and money by forcing alternatives into the same comparison.",
+    "prerequisites": ["mental-models"],
+    "next": ["incentives", "expected-value"],
+    "accent": "gold",
+    "sources": [
+      { "type": "Article", "label": "Economics introduction", "url": "https://www.khanacademy.org/economics-finance-domain/microeconomics/basic-economic-concepts-gen-microeconomics/opportunity-cost-and-the-production-possibilities-curve/a/introduction-to-opportunity-cost" },
+      { "type": "Video", "label": "Opportunity cost examples", "url": "https://www.youtube.com/results?search_query=opportunity+cost+examples" }
+    ]
+  },
+  {
+    "id": "second-order-effects",
+    "title": "Second-Order Effects",
+    "category": "Productivity",
+    "level": "Growing",
+    "minutes": 6,
+    "summary": "Ask what happens after the obvious result.",
+    "explanation": "First-order thinking considers the immediate effect. Second-order thinking follows how people and systems adapt, then examines the effects of those adaptations.",
+    "example": "Rewarding a support team for shorter calls lowers call time, but unresolved issues create repeat calls. The metric improves while the system gets worse.",
+    "why": "Many poor decisions look good at first. Looking one step further reveals delayed costs, hidden benefits, and unintended behavior.",
+    "prerequisites": ["systems-thinking"],
+    "next": ["incentives", "causal-inference"],
+    "accent": "violet",
+    "sources": [
+      { "type": "Article", "label": "Second-order thinking", "url": "https://fs.blog/second-order-thinking/" },
+      { "type": "Video", "label": "Consequences beyond the first", "url": "https://www.youtube.com/results?search_query=second+order+thinking" }
+    ]
+  },
+  {
+    "id": "incentives",
+    "title": "Incentives",
+    "category": "Economics",
+    "level": "Growing",
+    "minutes": 6,
+    "summary": "Systems produce the behavior they reward, not the behavior they request.",
+    "explanation": "Incentives are signals and consequences that make actions more or less attractive. They can be financial, social, moral, or embedded in the design of a process.",
+    "example": "If a school rewards attendance but not learning, it may fill seats without improving understanding. The measured target shapes behavior.",
+    "why": "Reading incentives helps explain organizations, markets, online platforms, and gaps between stated goals and actual outcomes.",
+    "prerequisites": ["opportunity-cost", "second-order-effects"],
+    "next": ["game-theory", "causal-inference"],
+    "accent": "coral",
+    "sources": [
+      { "type": "Article", "label": "Incentives in economics", "url": "https://www.econlib.org/library/Topics/College/incentives.html" },
+      { "type": "Video", "label": "Incentives and behavior", "url": "https://www.youtube.com/results?search_query=economics+incentives+behavior" }
+    ]
+  },
+  {
+    "id": "compounding",
+    "title": "Compounding",
+    "category": "Math",
+    "level": "Starter",
+    "minutes": 5,
+    "summary": "Small repeated gains can produce nonlinear growth.",
+    "explanation": "Compounding occurs when gains become part of the base that creates future gains. The same structure can amplify debt, technical shortcuts, and other costs.",
+    "example": "Ten minutes of learning each day seems small, but every idea makes later ideas easier to learn. Knowledge begins to build on knowledge.",
+    "why": "It explains why consistency matters in learning, money, health, relationships, and software maintenance.",
+    "prerequisites": ["feedback-loops"],
+    "next": ["exponential-growth", "gradient-descent"],
+    "accent": "mint",
+    "sources": [
+      { "type": "Article", "label": "Compound interest", "url": "https://www.investopedia.com/terms/c/compoundinterest.asp" },
+      { "type": "Video", "label": "Exponential growth intuition", "url": "https://www.youtube.com/results?search_query=exponential+growth+intuition" }
+    ]
+  },
+  {
+    "id": "expected-value",
+    "title": "Expected Value",
+    "category": "Math",
+    "level": "Growing",
+    "minutes": 8,
+    "summary": "Compare uncertain choices by weighting outcomes by probability.",
+    "explanation": "Expected value multiplies each possible outcome by its probability, then adds the results. It is a long-run average, not a promise about one attempt.",
+    "example": "A 20% chance to gain $100 and an 80% chance to lose $10 has an expected value of $12: 0.2 x 100 plus 0.8 x -10.",
+    "why": "It gives you a consistent language for decisions under uncertainty, from experiments and investments to product bets.",
+    "prerequisites": ["opportunity-cost"],
+    "next": ["bayesian-updating", "game-theory"],
+    "accent": "blue",
+    "sources": [
+      { "type": "Article", "label": "Expected value lesson", "url": "https://www.khanacademy.org/math/statistics-probability/random-variables-stats-library/random-variables-discrete/v/expected-value-basic" },
+      { "type": "Video", "label": "Expected value intuition", "url": "https://www.youtube.com/results?search_query=expected+value+intuition" }
+    ]
+  },
+  {
+    "id": "bayesian-updating",
+    "title": "Bayesian Updating",
+    "category": "Data Science",
+    "level": "Growing",
+    "minutes": 9,
+    "summary": "Revise a belief as new evidence arrives.",
+    "explanation": "Bayesian updating starts with a prior belief, weighs how likely the evidence is under competing explanations, and produces a revised belief.",
+    "example": "A positive medical test is less convincing when a condition is very rare. The base rate matters alongside the test's accuracy.",
+    "why": "It helps you avoid overreacting to a single observation and makes uncertainty something you can update rather than ignore.",
+    "prerequisites": ["expected-value"],
+    "next": ["causal-inference", "machine-learning"],
+    "accent": "violet",
+    "sources": [
+      { "type": "Article", "label": "Bayes theorem explained", "url": "https://betterexplained.com/articles/an-intuitive-and-short-explanation-of-bayes-theorem/" },
+      { "type": "Video", "label": "Bayes theorem visualized", "url": "https://www.youtube.com/results?search_query=3blue1brown+bayes+theorem" }
+    ]
+  },
+  {
+    "id": "gradient-descent",
+    "title": "Gradient Descent",
+    "category": "AI",
+    "level": "Growing",
+    "minutes": 8,
+    "summary": "Improve a model by repeatedly stepping toward lower error.",
+    "explanation": "Gradient descent measures how a loss function changes, then adjusts parameters in the direction that reduces loss. The learning rate controls the size of each step.",
+    "example": "Imagine hiking downhill in fog. You feel the local slope, take a small downhill step, and repeat until the ground stops descending.",
+    "why": "It is the optimization engine behind much of modern machine learning and makes model training less mysterious.",
+    "prerequisites": ["feedback-loops", "compounding"],
+    "next": ["machine-learning", "neural-networks"],
+    "accent": "gold",
+    "sources": [
+      { "type": "Documentation", "label": "Google ML guide", "url": "https://developers.google.com/machine-learning/crash-course/linear-regression/gradient-descent" },
+      { "type": "Video", "label": "Gradient descent visualized", "url": "https://www.youtube.com/results?search_query=3blue1brown+gradient+descent" }
+    ]
+  },
+  {
+    "id": "causal-inference",
+    "title": "Causal Inference",
+    "category": "Data Science",
+    "level": "Advanced",
+    "minutes": 10,
+    "summary": "Separate correlation from evidence that one thing caused another.",
+    "explanation": "Causal inference asks what would have happened under a different action. Because we cannot observe both realities at once, we use experiments or careful assumptions to estimate the counterfactual.",
+    "example": "Customers who use a feature may retain longer, but perhaps highly engaged customers were more likely to try it. An experiment can separate selection from impact.",
+    "why": "It prevents confident but costly decisions based on patterns that do not survive intervention.",
+    "prerequisites": ["second-order-effects", "bayesian-updating"],
+    "next": ["machine-learning"],
+    "accent": "coral",
+    "sources": [
+      { "type": "Paper", "label": "Causal inference overview", "url": "https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/" },
+      { "type": "Video", "label": "Causal inference introduction", "url": "https://www.youtube.com/results?search_query=causal+inference+introduction" }
+    ]
+  },
+  {
+    "id": "machine-learning",
+    "title": "Machine Learning",
+    "category": "AI",
+    "level": "Advanced",
+    "minutes": 10,
+    "summary": "Build systems that improve predictions from examples.",
+    "explanation": "Machine learning finds parameterized patterns that generalize from training data to new cases. Good evaluation matters as much as fitting the model.",
+    "example": "A spam filter learns from labeled messages, but it is useful only if it catches new spam without blocking legitimate mail.",
+    "why": "Understanding the training, evaluation, and deployment loop helps you reason clearly about what AI systems can and cannot do.",
+    "prerequisites": ["bayesian-updating", "gradient-descent"],
+    "next": ["neural-networks"],
+    "accent": "blue",
+    "sources": [
+      { "type": "Documentation", "label": "Google ML crash course", "url": "https://developers.google.com/machine-learning/crash-course" },
+      { "type": "Video", "label": "Machine learning overview", "url": "https://www.youtube.com/results?search_query=machine+learning+overview" }
+    ]
+  },
+  {
+    "id": "game-theory",
+    "title": "Game Theory",
+    "category": "Economics",
+    "level": "Advanced",
+    "minutes": 9,
+    "summary": "Reason about choices when outcomes depend on other decision-makers.",
+    "explanation": "Game theory studies strategies in situations where each participant's result depends on everyone's actions, information, and incentives.",
+    "example": "Two competing stores may both prefer higher prices, yet each has an incentive to undercut the other. Their individual logic creates a shared outcome.",
+    "why": "It clarifies negotiation, pricing, platform design, cooperation, and why individually rational actions can create poor group outcomes.",
+    "prerequisites": ["incentives", "expected-value"],
+    "next": [],
+    "accent": "violet",
+    "sources": [
+      { "type": "Article", "label": "Game theory introduction", "url": "https://plato.stanford.edu/entries/game-theory/" },
+      { "type": "Video", "label": "Game theory basics", "url": "https://www.youtube.com/results?search_query=game+theory+basics" }
+    ]
+  },
+  {
+    "id": "neural-networks",
+    "title": "Neural Networks",
+    "category": "AI",
+    "level": "Advanced",
+    "minutes": 11,
+    "summary": "Layers of simple functions learn useful representations.",
+    "explanation": "A neural network composes many weighted transformations. Training adjusts those weights so intermediate layers discover features useful for the final task.",
+    "example": "An image network may first detect edges, then textures and shapes, before combining those signals into an object prediction.",
+    "why": "Neural networks power modern language, vision, and audio systems. Their layered structure explains both their flexibility and their opacity.",
+    "prerequisites": ["gradient-descent", "machine-learning"],
+    "next": [],
+    "accent": "mint",
+    "sources": [
+      { "type": "Documentation", "label": "Neural networks guide", "url": "https://developers.google.com/machine-learning/crash-course/neural-networks" },
+      { "type": "Video", "label": "Neural networks visualized", "url": "https://www.youtube.com/results?search_query=3blue1brown+neural+networks" }
+    ]
+  },
+  {
+    "id": "exponential-growth",
+    "title": "Exponential Growth",
+    "category": "Math",
+    "level": "Growing",
+    "minutes": 7,
+    "summary": "A constant rate of change creates an accelerating curve.",
+    "explanation": "Exponential growth means a quantity changes in proportion to its current size. Equal time intervals multiply the value rather than adding a fixed amount.",
+    "example": "If a quantity doubles every week, it moves from 1 to 2 to 4 to 8. The early steps look quiet even though later growth is dramatic.",
+    "why": "It builds intuition for epidemics, adoption, interest, compute, and any process where current scale affects future change.",
+    "prerequisites": ["compounding"],
+    "next": ["expected-value"],
+    "accent": "gold",
+    "sources": [
+      { "type": "Article", "label": "Exponential growth lesson", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:exponential-growth-decay" },
+      { "type": "Video", "label": "Exponential growth examples", "url": "https://www.youtube.com/results?search_query=exponential+growth+explained" }
+    ]
+  }
+]
