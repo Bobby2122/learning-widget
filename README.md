@@ -1,47 +1,60 @@
-# Aster Learning Map
+# Aster STEM Learning Map
 
-Aster is an iPhone-first learning app prototype for discovering small, useful concepts across AI, computer science, data science, math, economics, and productivity.
+Aster is an iPhone-first interdisciplinary learning-map prototype spanning Mathematics, Physics, Computer Science, Biology, Chemistry, Economics, Data Science, and Machine Learning.
 
-This rebuild intentionally removes the standalone AI tutor, embedded chat interface, OpenAI API dependency, and recommendation backend. The product is a lightweight concept-card app built around a learning tree and local rules.
+The app uses local structured knowledge and deterministic recommendations. It does not require an API key, backend, or embedded chatbot.
 
 ## Run
 
 ```bash
-npm start
+node server.js
 ```
 
 Open `http://localhost:4173`.
 
-## Product Shape
+## Product
 
-- `Today`: one recommended concept card with explanation, example, why it matters, prerequisites, next recommendations, notes, actions, and deeper links.
-- `Path`: a progress-oriented learning tree where concepts unlock from prerequisites.
+- `Today`: a recommended concept with definition, explanation, examples, applications, formulas, prerequisites, cross-links, deeper concepts, notes, and external references.
+- `Path`: eight subject roots, difficulty lanes, concept search, and prerequisite routes that cross subject boundaries.
 - `Saved`: liked, saved, and noted concepts.
-- `You`: local progress and interest signals used by the recommendation rules.
+- `You`: progress and subject interests used by local recommendation rules.
 
-## Data
+## Knowledge Architecture
 
-Concepts live in [`src/concepts.json`](src/concepts.json). Add a concept by creating a new object with:
+The catalog is defined in [`src/knowledge/catalog.js`](src/knowledge/catalog.js). It currently contains 100 concepts.
 
-- `id`, `title`, `category`, `level`, `minutes`
-- `summary`, `explanation`, `example`, `why`
-- `prerequisites`, `next`
+Every normalized concept includes:
+
+- `id`, `title`, `subject`, `subjects`
+- `difficulty`
+- `shortDefinition`, `detailedExplanation`
+- `prerequisites`, `relatedTerms`, `deeperConcepts`
+- `applications`, `examples`
+- `formulaTex`
+- `frontierExtensions`
 - `sources`
 
-## Recommendation Rules
+`src/data.js` is the catalog boundary consumed by the UI. This allows the source to be split into multiple files, moved to JSON, or replaced by a database later without rewriting the views.
 
-The recommender in [`src/recommendation.js`](src/recommendation.js) is deterministic and local. It scores concepts using:
+## Recommendations
 
-- prerequisite completion
-- current path momentum
-- selected interests
-- level fit based on progress
-- novelty
-- liked, saved, and noted concepts
-- skipped and understood concepts
+[`src/recommendation.js`](src/recommendation.js) scores concepts using prerequisite completion, path momentum, cross-subject relationships, selected interests, difficulty fit, novelty, saves, likes, notes, skips, and completion.
 
-## iOS Widget Status
+## Formula Rendering
 
-This repository is a web app, not a native iOS app. A real iOS Home Screen widget requires a SwiftUI app target plus a WidgetKit extension, so it cannot be shipped directly from this codebase.
+Formulas are stored as TeX strings and rendered with KaTeX. If the CDN is unavailable, the original TeX remains readable as a fallback.
 
-The required native rebuild plan is documented in [`docs/IOS_WIDGET_PLAN.md`](docs/IOS_WIDGET_PLAN.md).
+## Future AI Integration
+
+[`src/services/aiProvider.js`](src/services/aiProvider.js) defines provider boundaries for:
+
+- generated explanations
+- selected-concept questions
+- recommendation ranking
+- learner-level estimation
+
+No provider is configured or used yet.
+
+## Native iOS
+
+The current project is a responsive web app. A native SwiftUI and WidgetKit migration plan is in [`docs/IOS_WIDGET_PLAN.md`](docs/IOS_WIDGET_PLAN.md).

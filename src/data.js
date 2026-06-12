@@ -1,13 +1,33 @@
+import { allConcepts, SUBJECTS } from "./knowledge/catalog.js";
+
 let conceptCache = [];
 
 export async function loadConcepts() {
-  if (conceptCache.length) return conceptCache;
-  const response = await fetch("/src/concepts.json");
-  if (!response.ok) throw new Error("Could not load local concept data");
-  conceptCache = await response.json();
+  if (!conceptCache.length) {
+    conceptCache = allConcepts.map((concept) => ({
+      ...concept,
+      category: concept.subject,
+      level: concept.difficulty[0].toUpperCase() + concept.difficulty.slice(1),
+      summary: concept.shortDefinition,
+      explanation: concept.detailedExplanation,
+      why: concept.applications.join(" "),
+      next: concept.deeperConcepts
+    }));
+  }
   return conceptCache;
 }
 
 export function indexConcepts(concepts) {
   return new Map(concepts.map((concept) => [concept.id, concept]));
 }
+
+export function conceptsBySubject(concepts) {
+  return new Map(
+    SUBJECTS.map((subject) => [
+      subject,
+      concepts.filter((concept) => concept.subjects.includes(subject))
+    ])
+  );
+}
+
+export { SUBJECTS };

@@ -1,10 +1,10 @@
-const LEVEL = { Starter: 1, Growing: 2, Advanced: 3 };
+const LEVEL = { beginner: 1, intermediate: 2, advanced: 3, frontier: 4 };
 
 function userState(state, id) {
   return state.interactions[id] || {};
 }
 
-function completedIds(state) {
+export function completedIds(state) {
   return new Set(
     Object.entries(state.interactions)
       .filter(([, value]) => value.understood)
@@ -21,23 +21,26 @@ export function scoreConcept(concept, state, concepts) {
   const interaction = userState(state, concept.id);
   const active = concepts.find((item) => item.id === state.activeConceptId);
   const completed = completedIds(state);
-  const completedCount = completed.size;
-  const desiredLevel = completedCount < 3 ? 1 : completedCount < 7 ? 2 : 3;
+  const desiredLevel = Math.min(4, 1 + Math.floor(completed.size / 12));
   const interests = new Set(state.profile.interests || []);
   const prerequisitesMet = concept.prerequisites.every((id) => completed.has(id));
   const completedPrerequisites = concept.prerequisites.filter((id) => completed.has(id)).length;
-  const followsCurrent = active?.next.includes(concept.id);
-  const interestMatch = interests.has(concept.category);
+  const followsCurrent = (active?.deeperConcepts || []).includes(concept.id);
+  const relatesToCurrent =
+    (active?.relatedTerms || []).includes(concept.id) ||
+    (concept.relatedTerms || []).includes(active?.id);
+  const interestMatch = concept.subjects.some((subject) => interests.has(subject));
 
   const breakdown = {
-    prerequisites: prerequisitesMet ? 34 : completedPrerequisites * 5 - 28,
-    pathMomentum: followsCurrent ? 24 : 0,
+    prerequisites: prerequisitesMet ? 34 : completedPrerequisites * 7 - 30,
+    pathMomentum: followsCurrent ? 24 : relatesToCurrent ? 10 : 0,
+    interdisciplinary: active && !concept.subjects.includes(active.subject) && relatesToCurrent ? 8 : 0,
     interest: interestMatch ? 18 : 2,
-    levelFit: Math.max(-12, 14 - Math.abs(LEVEL[concept.level] - desiredLevel) * 13),
+    levelFit: Math.max(-16, 15 - Math.abs(LEVEL[concept.difficulty] - desiredLevel) * 12),
     novelty: interaction.viewed ? -8 : 13,
     positiveSignals: (interaction.liked ? 5 : 0) + (interaction.saved ? 5 : 0) + (state.notes[concept.id] ? 4 : 0),
     skipped: interaction.skipped ? -38 : 0,
-    understood: interaction.understood ? -80 : 0
+    understood: interaction.understood ? -90 : 0
   };
 
   return {
@@ -62,14 +65,17 @@ export function recommendNext(state, concepts) {
 
 export function recommendationReason(concept, state, concepts) {
   const active = concepts.find((item) => item.id === state.activeConceptId);
-  if (active?.next.includes(concept.id)) {
+  if ((active?.deeperConcepts || []).includes(concept.id)) {
     return `Builds directly on ${active.title} while it is still fresh.`;
   }
-  if ((state.profile.interests || []).includes(concept.category)) {
-    return `Matches your interest in ${concept.category} and fits your current path.`;
+  if ((active?.relatedTerms || []).includes(concept.id) && active.subject !== concept.subject) {
+    return `Connects ${active.subject} to ${concept.subject} through a useful shared idea.`;
+  }
+  if (concept.subjects.some((subject) => (state.profile.interests || []).includes(subject))) {
+    return `Matches your interest in ${concept.subject} and fits your current level.`;
   }
   if (concept.prerequisites.length === 0) {
-    return "A useful new starting point that opens another branch of your map.";
+    return "A useful foundation that opens a new branch of your knowledge map.";
   }
   return "Your prerequisites are in place, so this is a natural next step.";
 }
@@ -80,4 +86,22 @@ export function pathStatus(concept, state) {
   if (concept.id === state.activeConceptId) return "current";
   if (isUnlocked(concept, state)) return "ready";
   return "locked";
+}
+
+export function learningRoute(targetId, concepts) {
+  const index = new Map(concepts.map((concept) => [concept.id, concept]));
+  const visited = new Set();
+  const route = [];
+
+  function visit(id) {
+    if (visited.has(id)) return;
+    visited.add(id);
+    const concept = index.get(id);
+    if (!concept) return;
+    concept.prerequisites.forEach(visit);
+    route.push(concept);
+  }
+
+  visit(targetId);
+  return route;
 }

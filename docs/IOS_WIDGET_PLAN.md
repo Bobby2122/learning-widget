@@ -7,7 +7,7 @@ The current Aster project is a web app. iOS Home Screen widgets are native exten
 1. `AsterApp`
    - SwiftUI iPhone app.
    - No Mac destination.
-   - Reads bundled concept JSON.
+   - Reads a bundled JSON export of the shared concept catalog.
    - Stores user interactions, notes, and selected interests in an App Group container.
 
 2. `AsterWidgetExtension`
@@ -24,15 +24,19 @@ Recommended Swift structs:
 struct Concept: Codable, Identifiable {
     let id: String
     let title: String
-    let category: String
-    let level: String
+    let subject: String
+    let subjects: [String]
+    let difficulty: String
     let minutes: Int
-    let summary: String
-    let explanation: String
-    let example: String
-    let why: String
+    let shortDefinition: String
+    let detailedExplanation: String
     let prerequisites: [String]
-    let next: [String]
+    let relatedTerms: [String]
+    let applications: [String]
+    let formulaTex: String
+    let examples: [String]
+    let deeperConcepts: [String]
+    let frontierExtensions: [String]
     let sources: [ConceptSource]
 }
 
@@ -75,4 +79,4 @@ Use an App Group such as:
 group.com.example.aster
 ```
 
-Store user state in `UserDefaults(suiteName:)` or a small file in the shared container. Keep concept JSON bundled with both targets or place it in a shared Swift package.
+Store user state in `UserDefaults(suiteName:)` or a small file in the shared container. Export the web catalog to JSON for both native targets, or move the canonical schema into a shared package during the SwiftUI migration.

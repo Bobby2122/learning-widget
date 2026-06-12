@@ -1,17 +1,17 @@
-const KEY = "aster-learning-map-v3";
-const VERSION = 3;
+const KEY = "aster-learning-map-v4";
+const VERSION = 4;
 
 export function initialState() {
   return {
     version: VERSION,
-    activeConceptId: "mental-models",
+    activeConceptId: "numbers",
     view: "today",
     interactions: {
-      "mental-models": { viewed: true }
+      "numbers": { viewed: true }
     },
     notes: {},
     profile: {
-      interests: ["AI", "Productivity", "Economics"],
+      interests: ["Mathematics", "Computer Science", "Machine Learning"],
       streak: 3,
       lastActiveDate: new Date().toISOString().slice(0, 10)
     }

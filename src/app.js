@@ -1,6 +1,7 @@
-import { indexConcepts, loadConcepts } from "./data.js";
+import { indexConcepts, loadConcepts, SUBJECTS } from "./data.js";
 import {
   isUnlocked,
+  learningRoute,
   pathStatus,
   recommendNext,
   recommendationReason
@@ -12,7 +13,9 @@ let conceptIndex = new Map();
 let state = loadState();
 let modal = null;
 let toast = "";
-let pathFilter = "All";
+let pathFilter = "Mathematics";
+let pathQuery = "";
+let pathTargetId = "";
 
 const iconPaths = {
   today: '<path d="M8 2v3M16 2v3M3.5 9h17M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/><path d="m9 15 2 2 4-5"/>',
@@ -63,6 +66,14 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value).replaceAll("\n", "&#10;");
+}
+
+function difficultyLabel(value) {
+  return value[0].toUpperCase() + value.slice(1);
 }
 
 function shell(content) {
@@ -129,6 +140,8 @@ function conceptCard(concept, expanded = false) {
   const item = interaction(concept.id);
   const prereqs = concept.prerequisites.map((id) => conceptIndex.get(id)).filter(Boolean);
   const next = concept.next.map((id) => conceptIndex.get(id)).filter(Boolean);
+  const related = concept.relatedTerms.map((id) => conceptIndex.get(id)).filter(Boolean);
+  const unlocked = isUnlocked(concept, state);
   return `
     <article class="concept-card accent-${concept.accent}">
       <div class="concept-visual" aria-hidden="true">
@@ -138,7 +151,7 @@ function conceptCard(concept, expanded = false) {
       </div>
       <div class="concept-body">
         <div class="concept-meta">
-          <span>${escapeHtml(concept.category)}</span>
+          ${concept.subjects.map((subject) => `<span>${escapeHtml(subject)}</span>`).join("")}
           <span>${escapeHtml(concept.level)}</span>
           <span>${concept.minutes} min</span>
         </div>
@@ -154,13 +167,18 @@ function conceptCard(concept, expanded = false) {
           <p class="section-label">The idea</p>
           <p>${escapeHtml(concept.explanation)}</p>
         </div>
+        ${concept.formulaTex ? `
+          <div class="formula-block">
+            <p class="section-label">Core formula</p>
+            <div class="tex-display" data-tex="${escapeAttribute(concept.formulaTex)}">${escapeHtml(concept.formulaTex)}</div>
+          </div>` : ""}
         <div class="example-block">
           <p class="section-label">A concrete example</p>
-          <p>${escapeHtml(concept.example)}</p>
+          <p>${escapeHtml(concept.examples[0])}</p>
         </div>
         <div class="lesson-section">
-          <p class="section-label">Why it matters</p>
-          <p>${escapeHtml(concept.why)}</p>
+          <p class="section-label">Applications</p>
+          <div class="application-list">${concept.applications.map((application) => `<span>${escapeHtml(application)}</span>`).join("")}</div>
         </div>
         ${state.notes[concept.id] ? `
           <button class="saved-note" data-action="note">
@@ -169,9 +187,16 @@ function conceptCard(concept, expanded = false) {
             ${icon("chevron")}
           </button>` : ""}
         ${relationBlock("Prerequisites", prereqs, "This branch starts here.")}
+        ${relationBlock("Cross-links", related, "Related ideas will appear here.")}
         ${relationBlock("Recommended next", next, "You have reached the end of this branch.")}
+        ${concept.frontierExtensions.length ? `
+          <div class="frontier-block">
+            <p class="section-label">Research frontier</p>
+            <div>${concept.frontierExtensions.map((extension) => `<span>${escapeHtml(extension)}</span>`).join("")}</div>
+          </div>` : ""}
         ${sourceBlock(concept)}
-        <button class="understood-button ${item.understood ? "complete" : ""}" data-action="understood">
+        ${!unlocked && !item.understood ? `<p class="locked-explainer">Preview mode: complete the prerequisite route before marking this concept understood.</p>` : ""}
+        <button class="understood-button ${item.understood ? "complete" : ""}" data-action="understood" ${!unlocked && !item.understood ? "disabled" : ""}>
           ${icon("check")}
           <span>${item.understood ? "Understood" : "Mark as understood"}</span>
         </button>
@@ -230,44 +255,118 @@ function compactCard(concept) {
 }
 
 function pathView() {
-  const categories = ["All", "AI", "Computer Science", "Data Science", "Math", "Economics", "Productivity"];
-  const visible = pathFilter === "All" ? concepts : concepts.filter((concept) => concept.category === pathFilter);
+  const normalizedQuery = pathQuery.trim().toLowerCase();
+  const visible = normalizedQuery
+    ? concepts.filter((concept) =>
+        [concept.title, concept.shortDefinition, ...concept.subjects]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery)
+      )
+    : concepts.filter((concept) => concept.subjects.includes(pathFilter));
+  const selectedTarget = conceptIndex.get(pathTargetId);
+  const route = selectedTarget ? learningRoute(selectedTarget.id, concepts) : [];
+  const levels = ["beginner", "intermediate", "advanced", "frontier"];
   return shell(`
     <section class="page-title">
       <p class="eyebrow">${progressPercent()}% of the map</p>
-      <h1>Your learning path</h1>
-      <p>Each idea unlocks a useful next step.</p>
+      <h1>STEM knowledge map</h1>
+      <p>${concepts.length} concepts connected through prerequisites and cross-subject links.</p>
     </section>
-    <div class="filter-row">
-      ${categories.map((category) => `<button class="${pathFilter === category ? "active" : ""}" data-filter="${category}">${category}</button>`).join("")}
-    </div>
-    <section class="path-list">
-      ${visible.map((concept, index) => pathNode(concept, index, visible)).join("")}
+    <form class="concept-search" id="concept-search">
+      <input type="search" id="path-query" value="${escapeAttribute(pathQuery)}" placeholder="Find heat equation, transformers..." aria-label="Search concepts">
+      <button>Search</button>
+    </form>
+    <section class="subject-roots" aria-label="Subject roots">
+      ${SUBJECTS.map((subject) => subjectRoot(subject)).join("")}
+    </section>
+    ${selectedTarget ? routePanel(selectedTarget, route) : ""}
+    <section class="map-toolbar">
+      <div><p class="eyebrow">${normalizedQuery ? "Search results" : pathFilter}</p><h2>${visible.length} connected concepts</h2></div>
+      ${normalizedQuery ? `<button data-clear-search>Clear</button>` : ""}
+    </section>
+    <section class="knowledge-map">
+      ${levels.map((level) => {
+        const nodes = visible.filter((concept) => concept.difficulty === level);
+        if (!nodes.length) return "";
+        return `<div class="level-lane">
+          <div class="level-heading"><span>${difficultyLabel(level)}</span><small>${nodes.length}</small></div>
+          <div class="level-nodes">${nodes.map(pathNode).join("")}</div>
+        </div>`;
+      }).join("")}
+      ${visible.length ? "" : `<div class="empty-state"><h2>No concepts found</h2><p>Try a subject, formula, or broader term.</p></div>`}
     </section>
   `);
 }
 
-function pathNode(concept, index, visible) {
-  const status = pathStatus(concept, state);
-  const previous = visible[index - 1];
-  const connected = previous && (
-    previous.next.includes(concept.id) ||
-    concept.prerequisites.includes(previous.id)
-  );
+function subjectRoot(subject) {
+  const count = concepts.filter((concept) => concept.subjects.includes(subject)).length;
+  const learned = concepts.filter((concept) => concept.subjects.includes(subject) && interaction(concept.id).understood).length;
   return `
-    <div class="path-step ${connected ? "connected" : ""}">
-      <div class="path-rail">
-        <span class="path-dot ${status}">${status === "understood" ? icon("check") : index + 1}</span>
+    <button class="subject-root ${pathFilter === subject && !pathQuery ? "active" : ""}" data-filter="${subject}">
+      <span class="root-symbol">${subject.split(" ").map((word) => word[0]).join("").slice(0, 2)}</span>
+      <strong>${escapeHtml(subject)}</strong>
+      <small>${learned}/${count} learned</small>
+    </button>`;
+}
+
+function routePanel(target, route) {
+  const subjects = [...new Set(route.flatMap((concept) => concept.subjects))];
+  const outward = [...new Set([...target.relatedTerms, ...target.deeperConcepts])]
+    .map((id) => conceptIndex.get(id))
+    .filter(Boolean)
+    .slice(0, 8);
+  return `
+    <section class="route-panel">
+      <div class="route-title">
+        <div><p class="eyebrow">Route to</p><h2>${escapeHtml(target.title)}</h2></div>
+        <button data-clear-route aria-label="Close route">×</button>
       </div>
-      <button class="path-card accent-${concept.accent} ${status}" data-concept="${concept.id}" ${status === "locked" ? "aria-describedby=locked-note" : ""}>
-        <span class="path-card-top">
-          <span>${escapeHtml(concept.category)} · ${escapeHtml(concept.level)}</span>
-          <span>${status === "understood" ? "Learned" : status === "current" ? "Today" : status === "ready" ? "Ready" : "Locked"}</span>
+      <p>${route.length} concepts across ${subjects.length} subjects</p>
+      <div class="route-track">
+        ${route.map((concept, index) => `
+          <button class="${pathStatus(concept, state)}" data-concept="${concept.id}">
+            <span>${index + 1}</span>
+            <strong>${escapeHtml(concept.title)}</strong>
+            <small>${escapeHtml(concept.subject)}</small>
+          </button>`).join("")}
+      </div>
+      ${outward.length ? `
+        <div class="route-connections">
+          <p class="section-label">Cross-subject extensions</p>
+          <div>
+            ${outward.map((concept) => `
+              <button data-concept="${concept.id}">
+                <span class="relation-mark accent-${concept.accent}"></span>
+                <span><strong>${escapeHtml(concept.title)}</strong><small>${escapeHtml(concept.subject)}</small></span>
+              </button>`).join("")}
+          </div>
+        </div>` : ""}
+    </section>`;
+}
+
+function pathNode(concept) {
+  const status = pathStatus(concept, state);
+  const prerequisites = concept.prerequisites
+    .map((id) => conceptIndex.get(id))
+    .filter(Boolean);
+  const crossSubjectCount = prerequisites.filter((item) => item.subject !== concept.subject).length;
+  return `
+    <article class="knowledge-node accent-${concept.accent} ${status}">
+      <button class="node-main" data-preview-concept="${concept.id}">
+        <span class="node-top">
+          <span>${escapeHtml(concept.subject)}</span>
+          <span>${status === "understood" ? "Learned" : status === "current" ? "Current" : status === "ready" ? "Ready" : "Locked"}</span>
         </span>
         <strong>${escapeHtml(concept.title)}</strong>
-        <small>${escapeHtml(concept.summary)}</small>
+        <small>${escapeHtml(concept.shortDefinition)}</small>
+        ${concept.formulaTex ? `<span class="node-formula tex-inline" data-tex="${escapeAttribute(concept.formulaTex)}">${escapeHtml(concept.formulaTex)}</span>` : ""}
       </button>
-    </div>`;
+      <div class="node-footer">
+        <span>${prerequisites.length} prereq${prerequisites.length === 1 ? "" : "s"}${crossSubjectCount ? ` · ${crossSubjectCount} cross-subject` : ""}</span>
+        <button data-route="${concept.id}">View route</button>
+      </div>
+    </article>`;
 }
 
 function savedView() {
@@ -312,7 +411,7 @@ function collectionCard(concept) {
 }
 
 function youView() {
-  const interests = ["AI", "Computer Science", "Data Science", "Math", "Economics", "Productivity"];
+  const interests = SUBJECTS;
   const liked = Object.values(state.interactions).filter((item) => item.liked).length;
   const saved = Object.values(state.interactions).filter((item) => item.saved).length;
   return shell(`
@@ -393,12 +492,7 @@ function openConcept(id) {
   const concept = conceptIndex.get(id);
   if (!concept) return;
   if (!isUnlocked(concept, state) && concept.prerequisites.length) {
-    const missing = concept.prerequisites
-      .filter((prerequisiteId) => !interaction(prerequisiteId).understood)
-      .map((prerequisiteId) => conceptIndex.get(prerequisiteId)?.title)
-      .filter(Boolean);
-    showToast(`Learn ${missing.join(" and ")} first`);
-    return;
+    showToast("Previewing a locked concept");
   }
   state.activeConceptId = id;
   state.view = "today";
@@ -461,11 +555,41 @@ function bindEvents() {
   document.querySelectorAll("[data-concept]").forEach((button) => {
     button.addEventListener("click", () => openConcept(button.dataset.concept));
   });
+  document.querySelectorAll("[data-preview-concept]").forEach((button) => {
+    button.addEventListener("click", () => {
+      pathTargetId = button.dataset.previewConcept;
+      render();
+      document.querySelector(".route-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  document.querySelectorAll("[data-route]").forEach((button) => {
+    button.addEventListener("click", () => {
+      pathTargetId = button.dataset.route;
+      render();
+      document.querySelector(".route-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
   document.querySelectorAll("[data-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       pathFilter = button.dataset.filter;
+      pathQuery = "";
+      pathTargetId = "";
       render();
     });
+  });
+  document.querySelector("#concept-search")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    pathQuery = document.querySelector("#path-query").value.trim();
+    pathTargetId = "";
+    render();
+  });
+  document.querySelector("[data-clear-search]")?.addEventListener("click", () => {
+    pathQuery = "";
+    render();
+  });
+  document.querySelector("[data-clear-route]")?.addEventListener("click", () => {
+    pathTargetId = "";
+    render();
   });
   document.querySelectorAll("[data-interest]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -506,9 +630,22 @@ function bindEvents() {
   });
   document.querySelector("[data-reset]")?.addEventListener("click", () => {
     state = resetState();
-    pathFilter = "All";
+    pathFilter = "Mathematics";
+    pathQuery = "";
+    pathTargetId = "";
     render();
     showToast("Progress reset");
+  });
+}
+
+function renderMath() {
+  if (!window.katex) return;
+  document.querySelectorAll("[data-tex]").forEach((element) => {
+    window.katex.render(element.dataset.tex, element, {
+      displayMode: element.classList.contains("tex-display"),
+      throwOnError: false,
+      strict: false
+    });
   });
 }
 
@@ -521,6 +658,7 @@ function render() {
   };
   document.querySelector("#app").innerHTML = (views[state.view] || todayView)();
   bindEvents();
+  renderMath();
 }
 
 async function bootstrap() {
@@ -540,3 +678,4 @@ async function bootstrap() {
 }
 
 bootstrap();
+window.addEventListener("load", renderMath);

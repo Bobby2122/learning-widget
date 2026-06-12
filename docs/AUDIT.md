@@ -5,7 +5,7 @@ Audit date: June 7, 2026
 ## Current Stack
 
 - Dependency-free web app served by `server.js`.
-- Static local concept data in `src/concepts.json`.
+- Modular local concept catalog in `src/knowledge/catalog.js`.
 - Local browser persistence through `localStorage`.
 - No OpenAI API key, chat endpoint, tutor fallback, or backend recommendation service.
 - No Xcode project, SwiftUI target, or WidgetKit extension.
@@ -19,7 +19,8 @@ Audit date: June 7, 2026
 - Added a learning path with prerequisite-based locking.
 - Added deterministic local recommendation scoring.
 - Added user actions: like, save, understood, skip, note, and external links.
-- Added local static content across AI, CS, data science, math, economics, and productivity.
+- Added 100 local concepts across Mathematics, Physics, Computer Science, Biology, Chemistry, Economics, Data Science, and Machine Learning.
+- Added cross-subject prerequisite routes, four difficulty levels, TeX formulas, and frontier extensions.
 
 ## Widget Finding
 
